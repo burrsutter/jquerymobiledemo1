@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script
+	src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
+<meta charset="US-ASCII">
+<title>Insert title here</title>
+
+<script>
+
+$(document).ready(function() {
+	// alert("ready");
+	console.log("jquery is ready");
+
+	$(document).on("pagebeforeshow","#page-2", function( ){
+		console.log("page-2 pagebeforeshow");
+		$.getJSON("rest/members", function(data) {
+			$("#contacts").empty();
+			var items = [];
+			$.each(data, function(key, val) {
+				console.log("item: " + key + " " + val.name);
+				items.push(
+					"<li>" +
+					"<h3><a href='#"+ key + "'>" + val.name + 
+					"</h3>" + 
+					"<p>" + val.phoneNumber + "</p>" + 
+					"</a></li>");
+			});
+			$("#contacts").append(items);
+			$("#contacts").listview("refresh");
+					
+		});
+		 
+	}); // pagebeforeshow
+		
+	//Register an event listener on the form submit action
+	$(document).on("tap","#btnSubmit", function(event) {
+		// event.preventDefault();
+	    var contactData = $("#contactForm").serializeObject();
+		console.log(contactData);
+	    postContact(contactData);
+	});
+	
+	function postContact(contactData) {
+	    $.ajax({
+	        url: 'rest/members',
+	        contentType: "application/json",
+	        dataType: "json",
+	        type: "POST",
+	        async: "false",
+	        data: JSON.stringify(contactData),
+	        success: function(data) {
+		        console.log("Saved:" + data);
+		        $('#contactForm')[0].reset();
+	        },
+	        error: function(error) {
+		        console.log("ERROR: " + error.status);
+		    }
+	    });	
+	} // postContact
+	
+	// used to serialize FORM values into JSON
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+}); // document.ready
+
+</script>
+</head>
+<body>
+	<div data-role="page" id="page-1">
+		<div data-role="panel" id="mypanel">
+			<!-- panel content goes here -->
+			<ul data-role="listview">
+				<li><a href="#page-1" data-transition="slide">Home</a></li>
+				<li><a href="#page-2" data-transition="slide">Search</a></li>
+				<li><a href="#page-3" data-transition="slide">Add Contact</a></li>
+				
+			</ul>
+
+
+		</div>
+		<!-- /panel -->
+		<div data-role="header">
+			<h1>Home Page</h1>
+			<a href="#mypanel" data-role="button" data-icon="bars"
+				data-iconpos="notext">Menu</a>
+
+
+		</div>
+		<div data-role="content">
+			<p>Page content goes here and another change.</p>
+			The quick brown fox jumped over the lazy dog
+		</div>
+		<div data-role="footer">
+			<h4>Home Page Footer</h4>
+		</div>
+	</div>
+	<div data-role="page" id="page-2">
+		<div data-role="panel" id="mypanel">
+			<!-- panel content goes here -->
+			<ul data-role="listview">
+				<li><a href="#page-1">Home</a></li>
+				<li><a href="#page-2">Search</a></li>
+				<li><a href="#page-3">Add Contact</a></li>
+			</ul>
+		</div>
+		<div data-role="header">
+			<h1>Search</h1>
+			<a href="#mypanel" data-role="button" data-icon="bars"
+				data-iconpos="notext">Menu</a>
+		</div>
+		<div data-role="content">
+			<ul data-role="listview" data-theme="a" data-divider-theme="a"
+				id="contacts" data-filter="true">
+				<li><a href="item1.html">Item 1</a></li>
+				<li><a href="item2.html">Item 2</a></li>
+				<li><a href="item3.html">Item 3</a></li>
+			</ul>
+
+
+
+		</div>
+		<div data-role="footer">
+			<h4>Search</h4>
+		</div>
+	</div>
+	<div data-role="page" id="page-3">
+		<div data-role="panel" id="mypanel">
+			<!-- panel content goes here -->
+			<ul data-role="listview">
+				<li><a href="#page-1">Home</a></li>
+				<li><a href="#page-2">Search</a></li>
+				<li><a href="#page-3">Add Contact</a></li>
+			</ul>
+		</div>
+
+		<div data-role="header">
+			<h1>Add Contact</h1>
+			<a href="#mypanel" data-role="button" data-icon="bars"
+				data-iconpos="notext">Menu</a> <a href="#aboutDialog"
+				data-rel="dialog" data-role="button" data-icon="info"
+				data-iconpos="notext">Dialog Button</a>
+
+
+		</div>
+		<div data-role="content">
+		<form name="contactForm" id="contactForm" data-ajax="false">
+<div data-role="fieldcontain">
+  <label for="name">Name</label>
+  <input name="name" id="name" data-clear-btn="true" value="" placeholder="First Name + Last Name" type="text"/>
+</div>
+
+<div data-role="fieldcontain">
+  <label for="email">Email</label>
+  <input name="email" id="email" data-clear-btn="true" value="" placeholder="Email Address" type="email"/>
+</div>
+
+<div data-role="fieldcontain">
+  <label for="phoneNumber">Phone</label>
+  <input name="phoneNumber" id="phoneNumber" data-clear-btn="true" value="" type="tel"/>
+</div>
+
+<div data-role="fieldcontain">
+  <label for="birthDate">Birth Date</label>
+  <input name="birthDate" id="birthDate" data-clear-btn="true" value="" type="date"/>
+</div>
+
+<div data-role="fieldcontain">
+  <label for="website">Website</label>
+  <input name="website" id="website" data-clear-btn="true" value="" type="url" placeholder="www.me.com"/>
+</div>
+
+
+
+
+			<a href=""
+				data-role="button" id="btnSubmit">Submit</a> 
+			<a href="" data-rel="back"
+				data-role="button">Cancel</a>
+
+				
+		</form>						
+		</div>
+		<div data-role="footer">
+			<h4>Add Contact</h4>
+		</div>
+	</div>
+
+	<div data-role="dialog" id="aboutDialog">
+		<div data-role="header">
+			<h1>About Dialog</h1>
+		</div>
+		<div data-role="content">
+			<h6>Dialog content.</h6>
+
+			<a href="#aboutDialog" data-role="button" data-rel="back">OK</a>
+		</div>
+	</div>
+
+
+</body>
+</html>
